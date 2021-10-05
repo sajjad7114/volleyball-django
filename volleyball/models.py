@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.utils import timezone
+import datetime
 
 # Create your models here.
 
@@ -38,8 +38,13 @@ class Match(models.Model):
 class TransAction(models.Model):
     amount = models.PositiveIntegerField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    date = models.DateField(default=timezone.now())
+    date = models.DateField(default=datetime.date.today)
     success = models.BooleanField()
+
+# {
+#     "amount": 4000,
+#     "success": "True"
+# }
 
 
 class Seat(models.Model):

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Stadium, Match
+from .models import Stadium, Match, TransAction
 
 
 class StadiumSerializer(serializers.ModelSerializer):
@@ -36,3 +36,9 @@ class MatchSerializer(serializers.ModelSerializer):
                 '`create()` did not return an object instance.'
             )
         return self.instance
+
+
+class TransActionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TransAction
+        fields = '__all__'
