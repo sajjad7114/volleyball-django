@@ -41,11 +41,6 @@ class TransAction(models.Model):
     date = models.DateField(default=datetime.date.today)
     success = models.BooleanField()
 
-# {
-#     "amount": 4000,
-#     "success": "True"
-# }
-
 
 class Seat(models.Model):
     index = models.PositiveIntegerField()
@@ -54,9 +49,3 @@ class Seat(models.Model):
     used = models.BooleanField(default=False)
     transaction = models.OneToOneField(TransAction, on_delete=models.CASCADE)
 
-
-# {
-#     "index": 1,
-#     "match": 9,
-#     "transaction": 1
-# }
