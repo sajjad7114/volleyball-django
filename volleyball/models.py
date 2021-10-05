@@ -51,4 +51,4 @@ class Seat(models.Model):
     index = models.PositiveIntegerField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     match = models.ForeignKey(Match, on_delete=models.CASCADE)
-    transaction = models.OneToOneField(TransAction, on_delete=models.CASCADE)
+    transaction = models.OneToOneField(TransAction, on_delete=models.PROTECT)

@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 from .serializers import StadiumSerializer, MatchSerializer, TransActionSerializer
-from .models import Stadium, Match, TransAction
+from .models import Stadium, Match, TransAction, Seat
 from rest_framework.views import APIView
 from django.contrib.auth.models import User
 from rest_framework import generics
@@ -51,7 +51,12 @@ class TransActionDetails(APIView):
             user = User.objects.get(pk=uid)
             transaction = user.transaction_set.get(pk=pk)
             serializer = TransActionSerializer(transaction)
-            return Response(serializer.data)
+            res = serializer.data.copy()
+            try:
+                res['seat'] = transaction.seat.pk
+            except:
+                res['seat'] = None
+            return Response(res)
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
