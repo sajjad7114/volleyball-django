@@ -29,7 +29,9 @@ class Match(models.Model):
         result = []
         for i in arr:
             try:
-                result.append(int(i))
+                num = int(i)
+                if self.stadium.capacity >= num > 0:
+                    result.append(int(i))
             except:
                 pass
         return result
