@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Stadium, Match, TransAction
+from .models import Stadium, Match, TransAction, Seat
 
 
 class StadiumSerializer(serializers.ModelSerializer):
@@ -41,4 +41,10 @@ class MatchSerializer(serializers.ModelSerializer):
 class TransActionSerializer(serializers.ModelSerializer):
     class Meta:
         model = TransAction
+        fields = '__all__'
+
+
+class SeatSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Seat
         fields = '__all__'

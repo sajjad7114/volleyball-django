@@ -1,5 +1,7 @@
+import datetime
+
 from rest_framework import viewsets
-from .serializers import StadiumSerializer, MatchSerializer, TransActionSerializer
+from .serializers import StadiumSerializer, MatchSerializer, TransActionSerializer, SeatSerializer
 from .models import Stadium, Match, TransAction, Seat
 from rest_framework.views import APIView
 from django.contrib.auth.models import User
@@ -10,6 +12,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.http import HttpResponse, JsonResponse
 from rest_framework import status
+from rest_framework.decorators import api_view
 from django.shortcuts import get_object_or_404
 
 # Create your views here.
@@ -60,3 +63,54 @@ class TransActionDetails(APIView):
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+
+@api_view(['GET', 'POST'])
+def ticket(request, uid):
+    try:
+        user = User.objects.get(pk=uid)
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        seats = user.seat_set.all()
+        serializer = SeatSerializer(seats, many=True)
+        return Response(serializer.data)
+
+    elif request.method == 'POST':
+        serializer = SeatSerializer(data=request.data)
+        serializer.initial_data['user'] = uid
+
+        if serializer.is_valid():
+            match = serializer.validated_data['match']
+            index = serializer.validated_data['index']
+            transaction = serializer.validated_data['transaction']
+            available_list = match.available_list()
+            if index not in available_list:
+                return Response({'message': 'The place is unavailable'}, status=status.HTTP_403_FORBIDDEN)
+            if match.date < datetime.date.today():
+                return Response({'message': 'The match is done'}, status=status.HTTP_410_GONE)
+            if transaction.amount < match.ticket_price:
+                return Response({'message': 'Transaction money is not enough'}, status=status.HTTP_403_FORBIDDEN)
+            try:
+                other_seat = Seat.objects.get(index=index, match=match)
+            except:
+                try:
+                    seat = transaction.seat
+                    return Response({'message': 'This transaction is used for another seat'},
+                                    status=status.HTTP_403_FORBIDDEN)
+                except:
+                    serializer.save()
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def retrieve_ticket(request, uid, pk):
+    try:
+        user = User.objects.get(pk=uid)
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    seat = user.seat_set.get(pk=pk)
+    serializer = SeatSerializer(seat)
+    return Response(serializer.data)
