@@ -6,6 +6,7 @@ from rest_framework import status
 
 class UserViewSets(APIView):
     def post(self, request):
+        print(request.headers)
         serializer = UserSerializers(data=request.data)
 
         if serializer.is_valid():
